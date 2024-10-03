@@ -20,6 +20,18 @@ ShadCN (Optional): To enhance the UI by providing pre-built accessible component
   
 Back-End & Server-Side:
 
-4) Web Hosting & Deployment:
+1) Web Hosting & Deployment:
 
 * Vercel: For hosting the Next.js app with optimized builds and automatic deployments.
+
+2) Backend API:
+
+* Flask (Python): To handle your custom server-side logic, such as OCR processing and interactions with the LLM. Flask can also manage certain parts of the app’s RESTful API.
+
+3) Database:
+
+* Firebase Firestore: A NoSQL cloud database for storing user data (e.g., user profiles, notes, ratings), providing scalability and easy integration with Firebase services.
+
+4) Authentication:
+
+* Firebase Authentication: For easy integration of user login, registration, and OAuth 2.0. It supports Google, email/password, and third-party authentication methods, perfect for a student-focused platform.
