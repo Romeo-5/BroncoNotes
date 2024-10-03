@@ -14,8 +14,8 @@ Authors - Romeo Nickel, Jeshwin Prince, Connor Vallero
 2) UI Components & Styling:
 
 * React: For building the user interface and managing the interactive components of the web app.
-TailwindCSS: A utility-first CSS framework to speed up styling and design.
-ShadCN (Optional): To enhance the UI by providing pre-built accessible components.
+* TailwindCSS: A utility-first CSS framework to speed up styling and design.
+* ShadCN (Optional): To enhance the UI by providing pre-built accessible components.
 
 3) UI/UX Design Tools (for wireframes and design prototyping):
 
