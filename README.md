@@ -5,7 +5,7 @@ Authors - Romeo Nickel, Jeshwin Prince, Connor Vallero
 
 ## Tech Stack 
 
-Front-End:
+> Front-End:
 
 1) Framework:
 
@@ -22,7 +22,7 @@ ShadCN (Optional): To enhance the UI by providing pre-built accessible component
 * Figma: For wireframing, designing, and prototyping your UI.
 
   
-Back-End & Server-Side:
+> Back-End & Server-Side:
 
 1) Web Hosting & Deployment:
 
