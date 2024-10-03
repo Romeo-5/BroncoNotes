@@ -1,6 +1,10 @@
 # BroncoNotes
 CSEN 174 - Software Engineering Group Project
 
+Authors - Romeo Nickel, Jeshwin Prince, Connor Vallero
+
+## Tech Stack 
+
 Front-End:
 
 1) Framework:
