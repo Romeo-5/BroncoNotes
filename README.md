@@ -2,6 +2,7 @@
 CSEN 174 - Software Engineering Group Project
 
 Front-End:
+
 1) Framework:
 
 * Next.js: A React framework with built-in features for server-side rendering, API routes, and static site generation, ideal for your web app on Vercel.
@@ -18,6 +19,7 @@ ShadCN (Optional): To enhance the UI by providing pre-built accessible component
 
   
 Back-End & Server-Side:
+
 4) Web Hosting & Deployment:
 
 * Vercel: For hosting the Next.js app with optimized builds and automatic deployments.
