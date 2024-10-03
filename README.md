@@ -11,10 +11,13 @@ Front-End:
 * React: For building the user interface and managing the interactive components of the web app.
 TailwindCSS: A utility-first CSS framework to speed up styling and design.
 ShadCN (Optional): To enhance the UI by providing pre-built accessible components.
-UI/UX Design Tools (for wireframes and design prototyping):
 
-Figma: For wireframing, designing, and prototyping your UI.
+3) UI/UX Design Tools (for wireframes and design prototyping):
+
+* Figma: For wireframing, designing, and prototyping your UI.
+
+  
 Back-End & Server-Side:
-Web Hosting & Deployment:
+4) Web Hosting & Deployment:
 
-Vercel: For hosting the Next.js app with optimized builds and automatic deployments.
+* Vercel: For hosting the Next.js app with optimized builds and automatic deployments.
