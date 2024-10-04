@@ -9,7 +9,7 @@ Authors - Romeo Nickel, Jeshwin Prince, Connor Vallero
 
 1) Framework:
 
-* Next.js: A React framework with built-in features for server-side rendering, API routes, and static site generation, ideal for your web app on Vercel.
+* Next.js: A React framework with built-in features for server-side rendering, API routes, and static site generation, ideal for a web app on Vercel.
 
 2) UI Components & Styling:
 
@@ -19,7 +19,7 @@ Authors - Romeo Nickel, Jeshwin Prince, Connor Vallero
 
 3) UI/UX Design Tools (for wireframes and design prototyping):
 
-* Figma: For wireframing, designing, and prototyping your UI.
+* Figma: For wireframing, designing, and prototyping the UI.
 
   
 ### Back-End & Server-Side:
@@ -30,7 +30,7 @@ Authors - Romeo Nickel, Jeshwin Prince, Connor Vallero
 
 2) Backend API:
 
-* Flask (Python): To handle your custom server-side logic, such as OCR processing and interactions with the LLM. Flask can also manage certain parts of the app’s RESTful API.
+* Flask (Python): To handle custom server-side logic, such as OCR processing and interactions with the LLM. Flask can also manage certain parts of the app’s RESTful API.
 
 3) Database:
 
