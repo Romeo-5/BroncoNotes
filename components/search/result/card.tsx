@@ -2,36 +2,8 @@ import Image from "next/image";
 import ExampleNote from "@/public/example_note.png";
 import { Download, Eye, ThumbsUp } from "lucide-react";
 import Link from "next/link";
-import { Note } from "@/app/types";
-
-// Helper function to convert date into readable string
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-// Helper function to format count numbers into readable strings
-function formatNumber(num: number) {
-  if (num < 1000) {
-    return num.toString(); // Display full number for anything below 1000
-  }
-
-  const units = ["k", "M", "B", "T"];
-  let unitIndex = -1;
-
-  while (num >= 1000 && unitIndex < units.length - 1) {
-    num /= 1000;
-    unitIndex++;
-  }
-
-  // Round to two significant figures for anything >= 1000
-  return `${num.toPrecision(3)}${units[unitIndex]}`;
-}
+import { formatDate, formatNumber } from "@/lib/utils";
+import { Note } from "@/lib/types";
 
 export default function SearchResultCard({ note }: { note: Note }) {
   return (
