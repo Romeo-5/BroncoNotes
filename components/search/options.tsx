@@ -56,7 +56,6 @@ export function SortBy({ state }: { state: [string, React.Dispatch<string>] }) {
           <SelectContent>
             <SelectGroup>
               <SelectItem value="relevance">Relevance</SelectItem>
-              <SelectItem value="size">Size</SelectItem>
               <SelectItem value="downloads">Downloads</SelectItem>
               <SelectItem value="upvotes">Upvotes</SelectItem>
               <SelectItem value="views">Views</SelectItem>

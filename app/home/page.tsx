@@ -28,7 +28,7 @@ const exampleClasses = [
 
 export default function HomePage() {
   return (
-    <main className="container mx-auto grid grid-cols-1 items-center place-content-center gap-y-4 min-h-screen p-24 sm:p-32">
+    <main className="container mx-auto flex flex-col justify-start items-center space-y-4 min-h-screen p-8 sm:p-16">
       <div className="text-8xl font-bold text-center">BroncoNotes</div>
       {/** Search Bar */}
       <SearchBar initialSearchTerm="" />
