@@ -16,7 +16,13 @@ export default function SearchBar({
   // State for placeholder text animation
   const [index, setIndex] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
-  const placeholderOptions = [" a class", " CSEN 146", " MATH 53", " ECON 101"];
+  const placeholderOptions = [
+    " a class",
+    " CSEN 174",
+    " OMIS 40",
+    " ECON 101",
+    " CHEM 12",
+  ];
 
   // Change placeholder at regular intervals
   useEffect(() => {
@@ -33,7 +39,8 @@ export default function SearchBar({
   };
 
   // Redirect to search results page after entering search term
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (searchTerm) router.push(`/search?searchterm=${searchTerm}`);
   };
 

@@ -8,29 +8,51 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export function PaginationDemo() {
+interface PaginationProps {
+  currentPage: number;
+  totalResults: number;
+  resultsPerPage: number;
+  onPageChange: (page: number) => void;
+}
+
+export default function SearchPagination({
+  currentPage,
+  totalResults,
+  resultsPerPage,
+  onPageChange,
+}: PaginationProps) {
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
+
+  const handlePrevious = () => {
+    if (currentPage > 1) onPageChange(currentPage - 1);
+  };
+
+  const handleNext = () => {
+    if (currentPage < totalPages) onPageChange(currentPage + 1);
+  };
+
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" />
+          <PaginationPrevious onClick={handlePrevious} href="#" />
         </PaginationItem>
+
+        {/* Dynamically create page numbers */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <PaginationItem key={page}>
+            <PaginationLink
+              href="#"
+              isActive={page === currentPage}
+              onClick={() => onPageChange(page)}
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+
         <PaginationItem>
-          <PaginationLink href="#">1</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#" isActive>
-            2
-          </PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationLink href="#">3</PaginationLink>
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationEllipsis />
-        </PaginationItem>
-        <PaginationItem>
-          <PaginationNext href="#" />
+          <PaginationNext onClick={handleNext} href="#" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

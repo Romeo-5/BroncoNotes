@@ -1,67 +1,115 @@
 "use client";
 
-import SearchBar from "@/components/search-bar";
+import SearchBar from "@/components/search/search-bar";
 import SearchResultCard from "@/components/search/result/card";
-import { PaginationDemo } from "@/components/search/result/pagination";
+import SearchPagination from "@/components/search/result/pagination";
 import { NumberResults, SortBy } from "@/components/search/options";
 import { useSearchParams } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
+import { Note } from "../types";
+import { useState } from "react";
 
 // Placeholder note data
-const exampleNotes = [
+const exampleNotes: Note[] = [
   {
-    id: "550e8400-e29b-41d4-a716-446655440000",
-    title: "Introduction to JavaScript",
-    date: "2023-10-01T12:34:56Z",
-    vote_count: 125,
-    view_count: 1000,
-    download_count: 450,
+    note_id: uuidv4(),
+    user_id: uuidv4(),
+    course_id: uuidv4(),
+    title: "Introduction to Machine Learning",
+    uploaded_at: "2024-04-15T10:30:00.000Z",
+    file_url:
+      "https://firebasestorage.googleapis.com/v0/b/project-1234/o/notes/ml_intro.pdf",
+    tags: ["machine learning", "ai", "lecture notes"],
+    view_count: 12500,
+    vote_count: 785,
+    download_count: 1045,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440001",
-    title: "Advanced CSS Techniques",
-    date: "2023-08-15T08:30:00Z",
-    vote_count: 78,
-    view_count: 600,
-    download_count: 250,
+    note_id: uuidv4(),
+    user_id: uuidv4(),
+    course_id: uuidv4(),
+    title: "Data Structures and Algorithms",
+    uploaded_at: "2024-03-20T09:15:00.000Z",
+    file_url:
+      "https://firebasestorage.googleapis.com/v0/b/project-1234/o/notes/dsa.pdf",
+    tags: ["data structures", "algorithms", "cs101"],
+    view_count: 9820,
+    vote_count: 1452,
+    download_count: 2525,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440002",
-    title: "Mastering React",
-    date: "2023-09-10T14:20:10Z",
-    vote_count: 200,
-    view_count: 1500,
-    download_count: 700,
+    note_id: uuidv4(),
+    user_id: uuidv4(),
+    course_id: uuidv4(),
+    title: "Advanced Calculus Notes",
+    uploaded_at: "2024-05-01T13:45:00.000Z",
+    file_url:
+      "https://firebasestorage.googleapis.com/v0/b/project-1234/o/notes/adv_calc.pdf",
+    tags: ["calculus", "math", "problem sets"],
+    view_count: 6750,
+    vote_count: 568,
+    download_count: 743,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440003",
-    title: "Node.js for Beginners",
-    date: "2023-07-20T09:15:30Z",
-    vote_count: 95,
-    view_count: 900,
-    download_count: 300,
+    note_id: uuidv4(),
+    user_id: uuidv4(),
+    course_id: uuidv4(),
+    title: "History of Ancient Civilizations",
+    uploaded_at: "2024-02-10T11:00:00.000Z",
+    file_url:
+      "https://firebasestorage.googleapis.com/v0/b/project-1234/o/notes/ancient_history.pdf",
+    tags: ["history", "ancient civilizations", "lecture notes"],
+    view_count: 8300,
+    vote_count: 134340,
+    download_count: 1560,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440004",
-    title: "Understanding TypeScript",
-    date: "2023-06-25T16:45:05Z",
-    vote_count: 135,
-    view_count: 1100,
-    download_count: 550,
+    note_id: uuidv4(),
+    user_id: uuidv4(),
+    course_id: uuidv4(),
+    title: "Introduction to Psychology",
+    uploaded_at: "2024-03-28T15:30:00.000Z",
+    file_url:
+      "https://firebasestorage.googleapis.com/v0/b/project-1234/o/notes/psych101.pdf",
+    tags: ["psychology", "cognitive science", "lecture notes"],
+    view_count: 18450,
+    vote_count: 2690,
+    download_count: 3245,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440005",
-    title: "Building Web Apps with Next.js",
-    date: "2023-05-10T11:00:00Z",
-    vote_count: 160,
-    view_count: 1200,
-    download_count: 600,
+    note_id: uuidv4(),
+    user_id: uuidv4(),
+    course_id: uuidv4(),
+    title: "Physics - Quantum Mechanics",
+    uploaded_at: "2024-04-10T14:00:00.000Z",
+    file_url:
+      "https://firebasestorage.googleapis.com/v0/b/project-1234/o/notes/quantum_physics.pdf",
+    tags: ["physics", "quantum mechanics", "homework solutions"],
+    view_count: 15230,
+    vote_count: 1802,
+    download_count: 2340,
   },
 ];
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState(3);
+  const [sort, setSort] = useState("");
+  const totalResults = exampleNotes.length;
+
+  // Paginate the results
+  const paginatedNotes = exampleNotes.slice(
+    (currentPage - 1) * resultsPerPage,
+    currentPage * resultsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <main className="container mx-auto flex flex-col justify-start items-center space-y-4 min-h-screen p-8 sm:p-16">
+    <main className="container mx-auto flex flex-col justify-start items-center space-y-4 min-h-screen p-24 sm:p-32">
       <SearchBar initialSearchTerm={searchParams.get("searchterm")!} />
       <div className="flex w-full justify-between">
         <div>
@@ -71,26 +119,21 @@ export default function SearchPage() {
           <div className="mt-1 text-xl">Showing 1-12 of 999 results</div>
         </div>
         <div className="flex h-full space-x-4">
-          <div>
-            <div>Results per page:</div>
-            <div className="mt-2">
-              <NumberResults />
-            </div>
-          </div>
-          <div>
-            <div>Sort By:</div>
-            <div className="mt-2">
-              <SortBy />
-            </div>
-          </div>
+          <NumberResults state={[resultsPerPage, setResultsPerPage]} />
+          <SortBy state={[sort, setSort]} />
         </div>
       </div>
       <div className="mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-        {exampleNotes.map((note, index) => (
+        {paginatedNotes.map((note, index) => (
           <SearchResultCard key={index} note={note} />
         ))}
       </div>
-      <PaginationDemo />
+      <SearchPagination
+        currentPage={currentPage}
+        totalResults={totalResults}
+        resultsPerPage={resultsPerPage}
+        onPageChange={handlePageChange}
+      />
     </main>
   );
 }
