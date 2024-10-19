@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { FilePlus2, Image } from "lucide-react";
-import SearchBar from "@/components/search-bar";
+import SearchBar from "@/components/search/search-bar";
 
 // Placeholder classes
 const exampleClasses = [
@@ -28,7 +28,7 @@ const exampleClasses = [
 
 export default function HomePage() {
   return (
-    <main className="container mx-auto grid grid-cols-1 items-center place-content-center gap-y-4 min-h-screen p-8 sm:p-16">
+    <main className="container mx-auto grid grid-cols-1 items-center place-content-center gap-y-4 min-h-screen p-24 sm:p-32">
       <div className="text-8xl font-bold text-center">BroncoNotes</div>
       {/** Search Bar */}
       <SearchBar initialSearchTerm="" />
