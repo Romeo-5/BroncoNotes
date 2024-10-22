@@ -1,7 +1,7 @@
 import NotePreview from "@/components/note/note-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Download, Flag } from "lucide-react";
+import { Bookmark, Download, Flag, Save } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PracticeTest from "@/components/note/practice-test";
 import VoteButtons from "@/components/note/vote-buttons";
@@ -22,6 +22,10 @@ export default function NotePage({
         <div className="text-6xl font-semibold">{exampleNote.title}</div>
         <div className="flex space-x-4">
           <VoteButtons initialCount={exampleNote.vote_count} />
+          <Button variant={"outline"}>
+            <Bookmark className="size-6 mr-2" />
+            <div className="whitespace-nowrap">Save</div>
+          </Button>
           <Button variant={"outline"}>
             <Download className="size-6 mr-2" />
             <div className="whitespace-nowrap">Download</div>

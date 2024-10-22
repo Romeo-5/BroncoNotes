@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { FilePlus2, Image } from "lucide-react";
 import SearchBar from "@/components/search/search-bar";
+import Link from "next/link";
 
 // Placeholder classes
 const exampleClasses = [
@@ -59,10 +60,13 @@ export default function HomePage() {
           </div>
         </div>
         {/** Upload Notes */}
-        <div className="w-1/3 flex flex-col items-center justify-center gap-y-4">
+        <Link
+          href="/upload"
+          className="w-1/3 flex flex-col items-center justify-center gap-y-4"
+        >
           <FilePlus2 className="size-32 text-border" />
           <div className="text-4xl font-semibold text-border">Upload Notes</div>
-        </div>
+        </Link>
       </div>
     </main>
   );

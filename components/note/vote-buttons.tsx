@@ -29,18 +29,18 @@ export default function VoteButtons({
     timestamp: new Date().toISOString(),
   };
 
-  useEffect(() => {
-    toast({
-      title: "Updated User Vote:",
-      description: (
-        <pre className="mt-2 rounded-md bg-foreground p-4">
-          <code className="text-background">
-            {JSON.stringify(exampleVote, null, 2)}
-          </code>
-        </pre>
-      ),
-    });
-  }, [vote]);
+  // useEffect(() => {
+  //   toast({
+  //     title: "Updated User Vote:",
+  //     description: (
+  //       <pre className="mt-2 rounded-md bg-foreground p-4">
+  //         <code className="text-background">
+  //           {JSON.stringify(exampleVote, null, 2)}
+  //         </code>
+  //       </pre>
+  //     ),
+  //   });
+  // }, [vote]);
 
   return (
     <TooltipProvider delayDuration={300}>
