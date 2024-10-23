@@ -4,9 +4,11 @@ import SearchBar from "@/components/search/search-bar";
 import SearchResultCard from "@/components/search/result/card";
 import SearchPagination from "@/components/search/result/pagination";
 import { NumberResults, SortBy } from "@/components/search/options";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { exampleNotes } from "@/lib/constants";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
@@ -14,6 +16,22 @@ export default function SearchPage() {
   const [resultsPerPage, setResultsPerPage] = useState(3);
   const [sort, setSort] = useState("");
   const totalResults = exampleNotes.length;
+  const router = useRouter();
+  const [user, setUser] = useState<User | string | null>(
+    "I am not null, idiot >:("
+  );
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      return setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    router.push("/");
+    return null;
+  }
 
   // Paginate the results
   const paginatedNotes = exampleNotes.slice(

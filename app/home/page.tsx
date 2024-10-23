@@ -1,7 +1,13 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { FilePlus2, Image } from "lucide-react";
 import SearchBar from "@/components/search/search-bar";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 // Placeholder classes
 const exampleClasses = [
@@ -28,6 +34,23 @@ const exampleClasses = [
 ];
 
 export default function HomePage() {
+  const router = useRouter();
+  const [user, setUser] = useState<User | string | null>(
+    "I am not null, idiot >:("
+  );
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      return setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    router.push("/");
+    return null;
+  }
+
   return (
     <main className="container mx-auto flex flex-col justify-start items-center space-y-4 min-h-screen p-8 sm:p-16">
       <div className="text-8xl font-bold text-center">BroncoNotes</div>

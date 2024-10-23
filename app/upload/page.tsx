@@ -1,6 +1,7 @@
 // app/upload/page.tsx
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { FilePlus2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -15,11 +16,30 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 
 const SubmitNotes = () => {
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
+  const [user, setUser] = useState<User | string | null>(
+    "I am not null, idiot >:("
+  );
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      return setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    router.push("/");
+    return null;
+  }
 
   // Accepted file types
   const acceptedFileTypes = ["application/pdf", "image/jpeg", "image/png"];
