@@ -17,8 +17,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { db, storage } from "@/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
+import Tesseract from "tesseract.js"; // Import Tesseract.js
 
-// Replace with actual authenticated user's ID when available.
 const userId = "UID123"; 
 
 const SubmitNotes = () => {
@@ -30,6 +30,7 @@ const SubmitNotes = () => {
   const [quarter, setQuarter] = useState("Fall");
   const [year, setYear] = useState("2024");
   const [extraInfo, setExtraInfo] = useState("");
+  const [ocrText, setOcrText] = useState<string>(""); // Store OCR text
 
   const acceptedFileTypes = ["application/pdf", "image/jpeg", "image/png"];
 
@@ -65,6 +66,19 @@ const SubmitNotes = () => {
     setFilePreview(null);
   };
 
+  const performOCR = async (image: File) => {
+    try {
+      const result = await Tesseract.recognize(image, "eng", {
+        logger: (m) => console.log(m), // Log OCR progress
+      });
+      setOcrText(result.data.text); // Store the extracted text
+      return result.data.text;
+    } catch (error) {
+      console.error("OCR Error:", error);
+      return "";
+    }
+  };
+
   const handleSubmit = async () => {
     if (!file || !title || !classCode) {
       setErrorMessage("Please fill all required fields and upload a file.");
@@ -72,26 +86,31 @@ const SubmitNotes = () => {
     }
 
     try {
-      // Upload the file to Firebase Storage
       const storageRef = ref(storage, `notes/${file.name}`);
       await uploadBytes(storageRef, file);
       const fileURL = await getDownloadURL(storageRef);
 
-      // Prepare the note data based on your schema
+      let extractedText = "";
+      if (file.type.startsWith("image/")) {
+        extractedText = await performOCR(file);
+      }
+
       const noteData = {
-        note_id: `${Date.now()}`,  // Basic timestamp-based ID
+        note_id: `${Date.now()}`,
         user_id: userId,
         course_id: classCode,
         title,
         description: extraInfo,
+        quarter,
+        year,
         upload_date: new Date().toISOString(),
         file_url: fileURL,
-        tags: [],  // Add tags if needed later
+        ocr_text: extractedText,
+        tags: [],
         views: 0,
         rating: 0,
       };
 
-      // Add the note to Firestore
       const docRef = await addDoc(collection(db, "notes"), noteData);
       console.log("Note uploaded with ID: ", docRef.id);
       alert("File uploaded and information saved successfully!");
@@ -131,11 +150,11 @@ const SubmitNotes = () => {
               {filePreview ? (
                 <img
                   src={filePreview}
-                  alt="Uploaded file"
+                  alt="Uploaded Preview"
                   className="max-h-64 object-contain mb-4"
                 />
               ) : (
-                <p className="text-gray-600">{file.name}</p>
+                <p>{file.name}</p>
               )}
               <button
                 onClick={handleRemoveFile}
@@ -154,10 +173,9 @@ const SubmitNotes = () => {
             </Label>
             <Input
               id="title"
-              type="text"
-              placeholder="Example: Moore's Law and Semiconductors"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter note title"
             />
           </div>
 
@@ -167,10 +185,9 @@ const SubmitNotes = () => {
             </Label>
             <Input
               id="class-code"
-              type="text"
-              placeholder="Example: CSEN 174"
               value={classCode}
               onChange={(e) => setClassCode(e.target.value)}
+              placeholder="Enter class code"
             />
           </div>
 
@@ -211,9 +228,9 @@ const SubmitNotes = () => {
             </Label>
             <Textarea
               id="extra-info"
-              placeholder="Add any extra information here..."
               value={extraInfo}
               onChange={(e) => setExtraInfo(e.target.value)}
+              placeholder="Any extra information..."
             />
           </div>
 
