@@ -17,7 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { db, storage } from "@/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
-import Tesseract from "tesseract.js"; // Import Tesseract.js
+import Tesseract from "tesseract.js"; 
+import { OpenAI } from "openai"; 
+
 
 const userId = "UID123"; 
 
@@ -33,6 +35,12 @@ const SubmitNotes = () => {
   const [ocrText, setOcrText] = useState<string>(""); // Store OCR text
 
   const acceptedFileTypes = ["application/pdf", "image/jpeg", "image/png"];
+
+  // OpenAI configuration
+  const client = new OpenAI({
+    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+    dangerouslyAllowBrowser: true,
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target.files?.[0];
@@ -79,6 +87,31 @@ const SubmitNotes = () => {
     }
   };
 
+  const generateSummary = async (title: string, description: string, ocr: string) => {
+    try {
+      const prompt = `
+        Title: ${title}
+        Class Code: ${classCode}
+        Quarter: ${quarter} ${year}
+        Description: ${description}
+        OCR Text: ${ocr}
+
+        Please generate a brief summary of the above content.
+      `;
+
+      const response = await client.chat.completions.create({
+        messages: [{ role: "user", content: prompt }],
+        model: "gpt-4",
+        max_tokens: 150,
+      });
+
+      return response.choices[0]?.message?.content || "No summary available.";
+    } catch (error) {
+      console.error("OpenAI Error:", error);
+      return "Failed to generate summary.";
+    }
+  };
+
   const handleSubmit = async () => {
     if (!file || !title || !classCode) {
       setErrorMessage("Please fill all required fields and upload a file.");
@@ -95,6 +128,8 @@ const SubmitNotes = () => {
         extractedText = await performOCR(file);
       }
 
+      const summary = await generateSummary(title, extraInfo, extractedText);
+
       const noteData = {
         note_id: `${Date.now()}`,
         user_id: userId,
@@ -106,6 +141,7 @@ const SubmitNotes = () => {
         upload_date: new Date().toISOString(),
         file_url: fileURL,
         ocr_text: extractedText,
+        summary,
         tags: [],
         views: 0,
         rating: 0,
@@ -113,7 +149,7 @@ const SubmitNotes = () => {
 
       const docRef = await addDoc(collection(db, "notes"), noteData);
       console.log("Note uploaded with ID: ", docRef.id);
-      alert("File uploaded and information saved successfully!");
+      alert("File uploaded and summary generated successfully!");
     } catch (error) {
       console.error("Error uploading file or saving data:", error);
       setErrorMessage("Failed to upload and save data.");
@@ -123,16 +159,16 @@ const SubmitNotes = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="text-6xl font-bold mb-8">Upload Notes</div>
-      <div className="flex flex-col md:flex-row space-y-8 space-x-0 md:space-y-0 md:space-x-8">
+      <div className="flex flex-col md:flex-row space-y-8 md:space-x-8">
         <div className="h-[550px] aspect-[17/22] mx-auto">
           {!file ? (
             <div
-              className="border border-dashed p-8 h-[550px] flex flex-col items-center justify-center space-y-2 rounded-lg"
+              className="border border-dashed p-8 h-full flex flex-col items-center justify-center rounded-lg"
               onDrop={handleDropFile}
               onDragOver={(event) => event.preventDefault()}
             >
               <Label htmlFor="file-upload" className="cursor-pointer">
-                <FilePlus2 className="size-32 text-border" />
+                <FilePlus2 size={32} />
                 <input
                   id="file-upload"
                   type="file"
@@ -141,12 +177,12 @@ const SubmitNotes = () => {
                   accept=".pdf,.jpg,.jpeg,.png"
                 />
               </Label>
-              <div className="text-border font-bold text-3xl">Upload Files</div>
-              <div className="text-border">or drag and drop files here</div>
+              <div className="text-3xl font-bold">Upload Files</div>
+              <div>or drag and drop files here</div>
               {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
             </div>
           ) : (
-            <div className="border border-dashed p-8 h-[550px] flex flex-col items-center justify-center rounded-lg">
+            <div className="border p-8 flex flex-col items-center justify-center rounded-lg">
               {filePreview ? (
                 <img
                   src={filePreview}
@@ -167,74 +203,59 @@ const SubmitNotes = () => {
         </div>
 
         <div className="flex-1">
-          <div className="mb-4">
-            <Label htmlFor="title" className="text-lg font-semibold">
-              Title
-            </Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter note title"
-            />
+          <Label htmlFor="title" className="text-lg font-semibold">Title</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter note title"
+          />
+
+          <Label htmlFor="class-code" className="text-lg font-semibold">Class Code</Label>
+          <Input
+            id="class-code"
+            value={classCode}
+            onChange={(e) => setClassCode(e.target.value)}
+            placeholder="Enter class code"
+          />
+
+          <div className="flex space-x-4 mt-4">
+            <Select onValueChange={setQuarter} defaultValue="Fall">
+              <SelectTrigger className="w-1/2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Fall">Fall</SelectItem>
+                  <SelectItem value="Winter">Winter</SelectItem>
+                  <SelectItem value="Spring">Spring</SelectItem>
+                  <SelectItem value="Summer">Summer</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={setYear} defaultValue="2024">
+              <SelectTrigger className="w-1/2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="2024">2024</SelectItem>
+                  <SelectItem value="2023">2023</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="mb-4">
-            <Label htmlFor="class-code" className="text-lg font-semibold">
-              Class Code
-            </Label>
-            <Input
-              id="class-code"
-              value={classCode}
-              onChange={(e) => setClassCode(e.target.value)}
-              placeholder="Enter class code"
-            />
-          </div>
+          <Label htmlFor="extra-info" className="text-lg font-semibold">Extra Information</Label>
+          <Textarea
+            id="extra-info"
+            value={extraInfo}
+            onChange={(e) => setExtraInfo(e.target.value)}
+            placeholder="Any extra information..."
+          />
 
-          <div className="mb-4">
-            <div className="text-lg font-semibold">Quarter</div>
-            <div className="flex space-x-4">
-              <Select onValueChange={setQuarter} defaultValue="Fall">
-                <SelectTrigger className="w-1/2 mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="Fall">Fall</SelectItem>
-                    <SelectItem value="Winter">Winter</SelectItem>
-                    <SelectItem value="Spring">Spring</SelectItem>
-                    <SelectItem value="Summer">Summer</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              <Select onValueChange={setYear} defaultValue="2024">
-                <SelectTrigger className="w-1/2 mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2023">2023</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <Label htmlFor="extra-info" className="text-lg font-semibold">
-              Extra Information
-            </Label>
-            <Textarea
-              id="extra-info"
-              value={extraInfo}
-              onChange={(e) => setExtraInfo(e.target.value)}
-              placeholder="Any extra information..."
-            />
-          </div>
-
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mt-4">
             <Button onClick={handleSubmit}>Submit</Button>
             <Link href="/home">
               <Button variant="outline">Cancel</Button>
