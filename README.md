@@ -18,19 +18,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# BroncoNotes 📚
 
-## Learn More
+BroncoNotes is a software platform designed for students at Santa Clara University (SCU) to share and review notes. The platform allows students to upload their notes, rate other students' notes, generate summaries, and test themselves on class material using AI-generated questions.
 
-To learn more about Next.js, take a look at the following resources:
+## Features 🚀
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Note Sharing**: Upload and download notes for SCU classes.
+- **Search Functionality**: Find notes by course code, title, or topic.
+- **Quarterly Organization**: Sort notes by academic quarters (Fall, Winter, Spring, Summer).
+- **AI Enhancements**:
+  - **OCR (Optical Character Recognition)**: Extract text from uploaded images.
+  - **AI-powered Summaries**: Generate summaries of uploaded notes.
+  - **Practice Questions**: Create custom quiz questions based on notes.
+- **Rating & Reporting**: Rate notes and report inappropriate content.
+- **Authentication**: Users can register and log in to access all features.
+- **Personalized Dashboard**: See uploaded notes and recommendations based on enrolled courses.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
