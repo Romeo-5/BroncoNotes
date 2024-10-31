@@ -20,6 +20,7 @@ import { collection, addDoc } from "firebase/firestore";
 import Tesseract from "tesseract.js"; 
 import { OpenAI } from "openai"; 
 
+
 const userId = "UID123"; 
 
 const SubmitNotes = () => {
@@ -31,7 +32,7 @@ const SubmitNotes = () => {
   const [quarter, setQuarter] = useState("Fall");
   const [year, setYear] = useState("2024");
   const [extraInfo, setExtraInfo] = useState("");
-  const [ocrText, setOcrText] = useState<string>("");
+  const [ocrText, setOcrText] = useState<string>(""); // Store OCR text
 
   const acceptedFileTypes = ["application/pdf", "image/jpeg", "image/png"];
 
@@ -76,9 +77,9 @@ const SubmitNotes = () => {
   const performOCR = async (image: File) => {
     try {
       const result = await Tesseract.recognize(image, "eng", {
-        logger: (m) => console.log(m),
+        logger: (m) => console.log(m), // Log OCR progress
       });
-      setOcrText(result.data.text);
+      setOcrText(result.data.text); // Store the extracted text
       return result.data.text;
     } catch (error) {
       console.error("OCR Error:", error);
