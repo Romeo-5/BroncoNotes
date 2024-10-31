@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { FilePlus2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -14,12 +15,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { db, storage } from "@/firebaseConfig";
+
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { db, storage, auth } from "@/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import Tesseract from "tesseract.js"; 
 import { OpenAI } from "openai"; 
-
 
 const userId = "UID123"; 
 
@@ -27,6 +30,23 @@ const SubmitNotes = () => {
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const router = useRouter();
+  const [user, setUser] = useState<User | string | null>(
+    "I am not null, idiot >:("
+  );
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      return setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    router.push("/");
+    return null;
+  }
+
   const [title, setTitle] = useState("");
   const [classCode, setClassCode] = useState("");
   const [quarter, setQuarter] = useState("Fall");

@@ -1,3 +1,5 @@
+"use client";
+
 import NotePreview from "@/components/note/note-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +10,10 @@ import VoteButtons from "@/components/note/vote-buttons";
 import { exampleClass, exampleNote, exampleSummary } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import ReportButton from "@/components/note/report-button";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "@/app/firebaseConfig";
 
 export default function NotePage({
   params,
@@ -16,6 +22,22 @@ export default function NotePage({
   params: { id: string };
   searchParams: { tab: string | undefined };
 }) {
+  const router = useRouter();
+  const [user, setUser] = useState<User | string | null>(
+    "I am not null, idiot >:("
+  );
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      return setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    router.push("/");
+    return null;
+  }
   return (
     <main className="container mx-auto min-h-screen p-8 sm:p-16">
       <div className="w-full flex flex-col lg:flex-row items-start lg:items-end justify-center lg:justify-between space-y-4 lg:space-y-0">
