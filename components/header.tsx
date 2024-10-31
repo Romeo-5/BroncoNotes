@@ -1,6 +1,5 @@
 "use client";
 
-import { Library } from "lucide-react";
 import { ModeToggle } from "./ui/mode-toggle";
 import { Button } from "./ui/button";
 import Link from "next/link";
@@ -37,13 +36,21 @@ export function Header() {
       <Button variant="ghost">About</Button>
       <div className="flex-1"></div>
       <ModeToggle />
-      {user ? (
+      {user && typeof user !== "string" ? (
         <>
           <Button variant="ghost" onClick={logout}>
             Logout
           </Button>
           <Link href="/profile">
-            <Button>Profile</Button>
+            <Button size="icon">
+              <Image
+                className="size-10 rounded-lg"
+                width={40}
+                height={40}
+                src={user.photoURL ?? "/public/BroncoNotes Logo.png"}
+                alt="User profile photo"
+              />
+            </Button>
           </Link>
         </>
       ) : (
