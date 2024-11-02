@@ -15,12 +15,11 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { db, storage, auth } from "@/firebaseConfig";
+import { db, storage } from "@/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import Tesseract from "tesseract.js"; 
 import { OpenAI } from "openai"; 
 
@@ -31,28 +30,13 @@ const SubmitNotes = () => {
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
-  const [user, setUser] = useState<User | string | null>(
-    "I am not null, idiot >:("
-  );
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      return setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  if (!user) {
-    router.push("/");
-    return null;
-  }
-
+  const [user, setUser] = useState<User | string | null>("I am not null, idiot >:(");
   const [title, setTitle] = useState("");
   const [classCode, setClassCode] = useState("");
   const [quarter, setQuarter] = useState("Fall");
   const [year, setYear] = useState("2024");
   const [extraInfo, setExtraInfo] = useState("");
-  const [ocrText, setOcrText] = useState<string>(""); // Store OCR text
+  const [ocrText, setOcrText] = useState<string>("");
 
   const acceptedFileTypes = ["application/pdf", "image/jpeg", "image/png"];
 
@@ -84,22 +68,12 @@ const SubmitNotes = () => {
     }
   };
 
-  const handleDropFile = (e: React.DragEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
-  };
-
-  const handleRemoveFile = () => {
-    setFile(null);
-    setFilePreview(null);
-  };
-
   const performOCR = async (image: File) => {
     try {
       const result = await Tesseract.recognize(image, "eng", {
-        logger: (m) => console.log(m), // Log OCR progress
+        logger: (m) => console.log(m),
       });
-      setOcrText(result.data.text); // Store the extracted text
+      setOcrText(result.data.text);
       return result.data.text;
     } catch (error) {
       console.error("OCR Error:", error);
@@ -139,6 +113,33 @@ const SubmitNotes = () => {
     }
 
     try {
+      // Step 1: Check if the course exists in Firestore
+      const courseQuery = query(
+        collection(db, "courses"),
+        where("course_id", "==", classCode)
+      );
+      const courseSnapshot = await getDocs(courseQuery);
+
+      let courseId = classCode;
+
+      if (courseSnapshot.empty) {
+        // Step 2: Add new course to Firestore if it doesn't exist
+        const newCourse = {
+          course_id: classCode,
+          course_name: title,
+          department: "Engineering", // Update department as needed
+          professor: "TBD", // Update professor if known
+          quarter: `${quarter} ${year}`,
+          description: extraInfo,
+          note_count: 1,
+        };
+
+        const courseRef = await addDoc(collection(db, "courses"), newCourse);
+        courseId = courseRef.id;
+        console.log("New course added with ID:", courseRef.id);
+      }
+
+      // Step 3: Proceed with uploading the note
       const storageRef = ref(storage, `notes/${file.name}`);
       await uploadBytes(storageRef, file);
       const fileURL = await getDownloadURL(storageRef);
@@ -153,7 +154,7 @@ const SubmitNotes = () => {
       const noteData = {
         note_id: `${Date.now()}`,
         user_id: userId,
-        course_id: classCode,
+        course_id: courseId,
         title,
         description: extraInfo,
         quarter,
@@ -184,7 +185,10 @@ const SubmitNotes = () => {
           {!file ? (
             <div
               className="border border-dashed p-8 h-full flex flex-col items-center justify-center rounded-lg"
-              onDrop={handleDropFile}
+              onDrop={(e) => {
+                e.preventDefault();
+                handleFileChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
+              }}
               onDragOver={(event) => event.preventDefault()}
             >
               <Label htmlFor="file-upload" className="cursor-pointer">
@@ -213,7 +217,10 @@ const SubmitNotes = () => {
                 <p>{file.name}</p>
               )}
               <button
-                onClick={handleRemoveFile}
+                onClick={() => {
+                  setFile(null);
+                  setFilePreview(null);
+                }}
                 className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md"
               >
                 Remove File

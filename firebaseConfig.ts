@@ -1,6 +1,6 @@
 // firebaseConfig.ts
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
@@ -16,3 +16,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+export const fetchCourses = async () => {
+    const coursesRef = collection(db, "courses");
+    const snapshot = await getDocs(coursesRef);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};

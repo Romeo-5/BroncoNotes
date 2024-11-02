@@ -8,12 +8,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAG9hV8HOu52l2f5NCHplsBOO2CVftUUgs",
+  authDomain: "bronconotes-3c743.firebaseapp.com",
+  projectId: "bronconotes-3c743",
+  storageBucket: "bronconotes-3c743.appspot.com",
+  messagingSenderId: "971063974436",
+  appId: "1:971063974436:web:3854ae3965e3378ece56b1",
+  measurementId: "G-9ZKPYVG36D"
 };
 
 const app = initializeApp(firebaseConfig);

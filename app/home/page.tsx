@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../firebaseConfig";
+import { db } from "../../firebaseConfig"; 
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 // Placeholder classes
 const exampleClasses = [
@@ -35,29 +37,57 @@ const exampleClasses = [
 
 export default function HomePage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | string | null>(
-    "I am not null, idiot >:("
-  );
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      return setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+
+        // Check if the user exists in Firestore
+        const userRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userRef);
+
+        if (!userDoc.exists()) {
+          // Create a new user document in Firestore
+          await setDoc(userRef, {
+            user_id: currentUser.uid,
+            name: currentUser.displayName,
+            email: currentUser.email,
+            role: "student", // default role
+            joined_date: new Date().toISOString(),
+            profile_photo_url: currentUser.photoURL,
+            major: "", // default, can be updated by the user
+            courses: [], // initial empty list of courses
+            reputation: 0, // default reputation
+          });
+          console.log("New user document created in Firestore.");
+        } else {
+          console.log("User already exists in Firestore.");
+        }
+      } else {
+        setUser(null);
+        router.push("/"); // Redirect to landing page if not authenticated
+      }
     });
+
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   if (!user) {
-    router.push("/");
     return null;
   }
 
   return (
     <main className="container mx-auto flex flex-col justify-start items-center space-y-4 min-h-screen p-8 sm:p-16">
       <div className="text-8xl font-bold text-center">BroncoNotes</div>
-      {/** Search Bar */}
+      
+      {/* Search Bar */}
       <SearchBar initialSearchTerm="" />
+
       <div className="w-full h-[440px] flex space-x-1 *:rounded-lg *:border *:p-4">
-        {/** Current Classes (Optional?) */}
+        
+        {/* Current Classes (Optional?) */}
         <div className="w-2/3">
           <div className="flex justify-between h-fit mb-2">
             <div>
@@ -82,7 +112,8 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-        {/** Upload Notes */}
+        
+        {/* Upload Notes */}
         <Link
           href="/upload"
           className="w-1/3 flex flex-col items-center justify-center gap-y-4"
