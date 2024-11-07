@@ -42,9 +42,9 @@ export function Header() {
             Logout
           </Button>
           <Link href="/profile">
-            <Button size="icon">
+            <Button size="icon" className="rounded-full">
               <Image
-                className="size-10 rounded-lg"
+                className="size-10 rounded-full"
                 width={40}
                 height={40}
                 src={user.photoURL ?? "/public/BroncoNotes Logo.png"}
