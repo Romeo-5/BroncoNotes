@@ -33,7 +33,8 @@ export default function NotePage({
   const [user, setUser] = useState<User | string | null>(
     "I am not null, idiot >:("
   );
-  const [noteData, setNoteData] = useState<DocumentData>({});
+  const [noteData, setNoteData] = useState<DocumentData>();
+  const [courseData, setCourseData] = useState<DocumentData>();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -65,13 +66,27 @@ export default function NotePage({
 
   // Fetch note data from Firestore
   useEffect(() => {
-    const fetchNoteData = async () => {
+    const fetchData = async () => {
+      // Get note data
       try {
         const noteRef = doc(db, "notes", params.id);
         const noteSnapshot = await getDoc(noteRef);
 
         if (noteSnapshot.exists()) {
           setNoteData(noteSnapshot.data());
+          // Get course data from course_id in note
+          try {
+            const courseRef = doc(db, "courses", noteSnapshot.data().course_id);
+            const courseSnapshot = await getDoc(courseRef);
+
+            if (courseSnapshot.exists()) {
+              setCourseData(courseSnapshot.data());
+            } else {
+              console.error("Course not found");
+            }
+          } catch (error) {
+            console.error("Error fetching course data:", error);
+          }
         } else {
           console.error("Note not found");
         }
@@ -80,18 +95,24 @@ export default function NotePage({
       }
     };
 
-    fetchNoteData();
+    fetchData();
   }, [params.id]);
 
   return (
+    noteData &&
+    courseData &&
     typeof user !== "string" && (
       <main className="container mx-auto h-[calc(100vh-64px)] p-8 sm:p-16">
         <div className="w-full flex flex-col lg:flex-row items-start lg:items-end justify-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="text-6xl font-semibold">{noteData.title}</div>
           <div className="flex space-x-4">
-            <VoteButtons noteId={params.id} />
+            <VoteButtons noteId={params.id} userId={user.uid} />
             <SaveButton noteId={params.id} userId={user.uid} />
-            <DownloadButton noteId={params.id} fileUrl={noteData.file_url} />
+            <DownloadButton
+              noteId={params.id}
+              fileUrl={noteData.file_url}
+              download={noteData.title}
+            />
             <ReportButton />
           </div>
         </div>
@@ -99,18 +120,13 @@ export default function NotePage({
           Added {formatDate(noteData.upload_date)}
         </div>
         <div className="mt-2 flex space-x-3">
+          <Badge className="whitespace-nowrap">{courseData.course_name}</Badge>
           <Badge className="whitespace-nowrap">
-            {exampleClass.department} {exampleClass.number}
+            {noteData.quarter} {noteData.year}
           </Badge>
-          <Badge className="whitespace-nowrap">{exampleClass.quarter}</Badge>
-          {exampleNote.tags.map((tag, index) => (
-            <Badge key={index} className="whitespace-nowrap">
-              {tag}
-            </Badge>
-          ))}
         </div>
         <div className="w-full flex flex-col lg:flex-row justify-between space-x-0 space-y-8 lg:space-x-16 lg:space-y-0 mt-9 pl-12">
-          <NotePreview />
+          <NotePreview file={noteData.file_url} />
           <Tabs
             defaultValue={
               searchParams.tab === "practice" ? "practice" : "summary"
@@ -126,7 +142,7 @@ export default function NotePage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value="summary" className="w-full">
-              <div className="whitespace-pre-wrap">{exampleSummary}</div>
+              <div className="whitespace-pre-wrap">{noteData.summary}</div>
             </TabsContent>
             <TabsContent value="practice" className="w-full">
               <PracticeTest />

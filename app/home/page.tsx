@@ -36,6 +36,8 @@ export default function HomePage() {
             major: "", // default, can be updated by the user
             courses: [], // initial empty list of courses
             saved_notes: [], // initial empty list of saved notes
+            upvoted_notes: [], // initial empty list of upvoted notes
+            downvoted_notes: [], // initial empty list of downvoted notes
             reputation: 0, // default reputation
           });
           console.log("New user document created in Firestore.");

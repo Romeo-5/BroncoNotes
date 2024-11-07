@@ -11,61 +11,104 @@ import {
 } from "@/components/ui/tooltip";
 import { formatNumber } from "@/lib/utils";
 import { db } from "@/firebaseConfig"; // Import Firestore configuration
-import { doc, updateDoc, increment, getDoc } from "firebase/firestore";
+import {
+  doc,
+  updateDoc,
+  increment,
+  getDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
 
-export default function VoteButtons({ noteId }: { noteId: string }) {
+export default function VoteButtons({
+  noteId,
+  userId,
+}: {
+  noteId: string;
+  userId: string;
+}) {
   const [vote, setVote] = useState(0); // -1 for downvote, 0 for no vote, 1 for upvote
   const [count, setCount] = useState(0); // Initial count from Firestore
 
-  // Fetch current vote count from Firestore on component mount
+  // Fetch initial vote count and user's vote status for this note
   useEffect(() => {
-    const fetchVoteCount = async () => {
+    const fetchVoteData = async () => {
       try {
         const noteRef = doc(db, "notes", noteId);
-        const noteDoc = await getDoc(noteRef);
+        const userRef = doc(db, "users", userId);
+
+        const [noteDoc, userDoc] = await Promise.all([
+          getDoc(noteRef),
+          getDoc(userRef),
+        ]);
 
         if (noteDoc.exists()) {
-          const data = noteDoc.data();
-          setCount(data.rating || 0); // Set initial vote count
+          setCount(noteDoc.data().rating || 0);
+        }
+
+        if (userDoc.exists()) {
+          const { upvoted_notes = [], downvoted_notes = [] } = userDoc.data();
+          if (upvoted_notes.includes(noteId)) {
+            setVote(1);
+          } else if (downvoted_notes.includes(noteId)) {
+            setVote(-1);
+          }
         }
       } catch (error) {
-        console.error("Error fetching vote count:", error);
+        console.error("Error fetching vote data:", error);
       }
     };
 
-    fetchVoteCount();
-  }, [noteId]);
+    fetchVoteData();
+  }, [noteId, userId]);
 
-  // Function to update the vote count in Firestore
-  const updateVoteCount = async (incrementValue: number) => {
+  // Function to update both the note's vote count and user's vote history
+  const updateVoteCount = async (incrementValue: number, isUpvote: boolean) => {
     try {
       const noteRef = doc(db, "notes", noteId);
+      const userRef = doc(db, "users", userId);
+
+      // Update the vote count on the note
       await updateDoc(noteRef, {
         rating: increment(incrementValue),
       });
+
+      // Update user's upvoted/downvoted notes
+      if (isUpvote) {
+        await updateDoc(userRef, {
+          upvoted_notes: arrayUnion(noteId),
+          downvoted_notes: arrayRemove(noteId),
+        });
+      } else {
+        await updateDoc(userRef, {
+          upvoted_notes: arrayRemove(noteId),
+          downvoted_notes: arrayUnion(noteId),
+        });
+      }
+
       setCount((prev) => prev + incrementValue);
     } catch (error) {
-      console.error("Error updating vote count:", error);
+      console.error("Error updating vote:", error);
     }
   };
 
   const handleUpvote = () => {
     if (vote === 1) {
       setVote(0);
-      updateVoteCount(-1); // Remove upvote
+      updateVoteCount(-1, true); // Remove upvote
     } else {
       setVote(1);
-      updateVoteCount(vote === -1 ? 2 : 1); // Convert downvote to upvote or add upvote
+      updateVoteCount(vote === -1 ? 2 : 1, true); // Convert downvote to upvote or add upvote
     }
   };
 
   const handleDownvote = () => {
     if (vote === -1) {
       setVote(0);
-      updateVoteCount(1); // Remove downvote
+      updateVoteCount(1, false); // Remove downvote
     } else {
       setVote(-1);
-      updateVoteCount(vote === 1 ? -2 : -1); // Convert upvote to downvote or add downvote
+      updateVoteCount(vote === 1 ? -2 : -1, false); // Convert upvote to downvote or add downvote
     }
   };
 

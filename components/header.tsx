@@ -22,7 +22,7 @@ export function Header() {
   }, []);
 
   return (
-    <div className="sticky top-0 z-10 w-screen h-16 px-4 flex space-x-2 items-center">
+    <div className="sticky top-0 z-10 w-screen h-16 px-4 flex space-x-2 items-center bg-background">
       <Link href="/">
         <Button variant={"ghost"} size={"icon"}>
           <Image

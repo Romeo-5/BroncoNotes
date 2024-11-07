@@ -41,14 +41,8 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
-  if (!user) {
-    router.push("/");
-    return null;
-  }
-
-  if (typeof user === "string") return null;
-
   useEffect(() => {
+    if (!user || typeof user === "string") return;
     const getUserInfo = async () => {
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnapshot = await getDoc(userDocRef);
@@ -56,6 +50,13 @@ export default function ProfilePage() {
     };
     getUserInfo();
   }, [user]);
+
+  if (!user) {
+    router.push("/");
+    return null;
+  }
+
+  if (typeof user === "string") return null;
 
   return (
     typeof user !== "string" && (
@@ -99,9 +100,6 @@ export default function ProfilePage() {
             className="flex-1 overflow-hidden flex flex-col space-y-4 items-center"
           >
             <TabsList className="w-full grid grid-cols-2">
-              {/* <TabsTrigger value="myclasses" className="font-semibold">
-                My Classes
-              </TabsTrigger> */}
               <TabsTrigger value="mynotes" className="font-semibold">
                 My Notes
               </TabsTrigger>
@@ -109,10 +107,6 @@ export default function ProfilePage() {
                 Saved Notes
               </TabsTrigger>
             </TabsList>
-
-            {/* <TabsContent value="myclasses" className="w-full">
-              <UserClasses />
-            </TabsContent> */}
             <TabsContent value="mynotes" className="w-full">
               <SearchResults
                 title="My Notes"
@@ -127,7 +121,13 @@ export default function ProfilePage() {
                 title="Saved Notes"
                 query={query(
                   collection(db, "notes"),
-                  where("user_id", "in", userInfo.saved_notes)
+                  where(
+                    "__name__",
+                    "in",
+                    userInfo.saved_notes?.length
+                      ? userInfo.saved_notes
+                      : ["not null"]
+                  )
                 )}
               />
             </TabsContent>

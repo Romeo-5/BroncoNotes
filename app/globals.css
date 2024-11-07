@@ -100,3 +100,7 @@ canvas {
   border-top-left-radius: var(--radius);
   border-top-right-radius: var(--radius);
 }
+
+.round-pdf > * {
+  border-radius: var(--radius);
+}

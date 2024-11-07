@@ -22,6 +22,7 @@ export default function SearchResults({
       if (querySnapshot.empty) {
         setQueryResults([]);
       } else {
+        console.dir(querySnapshot.docs.map((doc) => doc.data()));
         setQueryResults(querySnapshot.docs);
       }
     };

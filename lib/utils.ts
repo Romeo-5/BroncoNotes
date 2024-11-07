@@ -23,6 +23,7 @@ export function formatDate(dateString: string) {
 
 // Helper function to format count numbers into readable strings
 export function formatNumber(num: number) {
+  if (!num) return 0;
   if (num < 1000) {
     return num.toString(); // Display full number for anything below 1000
   }

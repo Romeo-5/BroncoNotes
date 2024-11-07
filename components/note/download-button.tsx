@@ -9,9 +9,11 @@ import Link from "next/link";
 export default function DownloadButton({
   noteId,
   fileUrl,
+  download,
 }: {
   noteId: string;
   fileUrl: string;
+  download: string;
 }) {
   const handleDownload = async () => {
     try {
@@ -26,7 +28,7 @@ export default function DownloadButton({
   };
 
   return (
-    <Link href={fileUrl}>
+    <Link href={fileUrl} target="_blank" download={download}>
       <Button variant="outline" onClick={handleDownload}>
         <Download className="size-6 mr-2" />
         <div className="whitespace-nowrap">Download</div>
