@@ -88,3 +88,15 @@ body {
   display: inline-block;
   animation: rolodex 0.5s ease-in-out;
 }
+
+/* Make PDF previews fit inside cards */
+canvas {
+  width: 100% !important;
+  height: fit-content !important;
+  object-fit: contain !important;
+}
+
+.round-pdf-top > * {
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
