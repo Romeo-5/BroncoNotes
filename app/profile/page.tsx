@@ -7,8 +7,6 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/app/firebaseConfig";
 import Image from "next/image";
-import { exampleNotes } from "@/lib/constants";
-import UserClasses from "@/components/profile/classes";
 import SearchResults from "@/components/search/result";
 import { Trash2 } from "lucide-react";
 import {
@@ -17,6 +15,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Tooltip } from "@radix-ui/react-tooltip";
+import {
+  collection,
+  doc,
+  DocumentData,
+  getDoc,
+  query,
+  where,
+} from "firebase/firestore";
+import { db } from "@/firebaseConfig";
 
 export default function ProfilePage() {
   const searchParams = useSearchParams();
@@ -25,6 +32,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | string | null>(
     "I am not null, idiot >:("
   );
+  const [userInfo, setUserInfo] = useState<DocumentData>({});
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -33,14 +41,26 @@ export default function ProfilePage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!user || typeof user === "string") return;
+    const getUserInfo = async () => {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDocSnapshot = await getDoc(userDocRef);
+      if (userDocSnapshot.exists()) setUserInfo(userDocSnapshot.data());
+    };
+    getUserInfo();
+  }, [user]);
+
   if (!user) {
     router.push("/");
     return null;
   }
 
+  if (typeof user === "string") return null;
+
   return (
     typeof user !== "string" && (
-      <main className="container mx-auto min-h-screen p-8 sm:p-16">
+      <main className="container mx-auto h-[calc(100vh-64px)] p-8 sm:p-16">
         <div className="flex w-full">
           <Image
             className=" size-24 rounded-full"
@@ -76,13 +96,10 @@ export default function ProfilePage() {
         <div className="flex space-x-4"></div>
         <div className="w-full flex flex-col lg:flex-row justify-between space-x-0 space-y-8 lg:space-x-16 lg:space-y-0 mt-9">
           <Tabs
-            defaultValue={tab === "myclasses" ? "myclasses" : "mynotes"}
+            defaultValue={tab === "mynotes" ? "mynotes" : "savednotes"}
             className="flex-1 overflow-hidden flex flex-col space-y-4 items-center"
           >
-            <TabsList className="w-full grid grid-cols-3">
-              <TabsTrigger value="myclasses" className="font-semibold">
-                My Classes
-              </TabsTrigger>
+            <TabsList className="w-full grid grid-cols-2">
               <TabsTrigger value="mynotes" className="font-semibold">
                 My Notes
               </TabsTrigger>
@@ -90,17 +107,28 @@ export default function ProfilePage() {
                 Saved Notes
               </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="myclasses" className="w-full">
-              <UserClasses />
-            </TabsContent>
             <TabsContent value="mynotes" className="w-full">
-              <SearchResults resultsTitle="My Notes" results={exampleNotes} />
+              <SearchResults
+                title="My Notes"
+                query={query(
+                  collection(db, "notes"),
+                  where("user_id", "==", user.uid)
+                )}
+              />
             </TabsContent>
             <TabsContent value="savednotes" className="w-full">
               <SearchResults
-                resultsTitle="Saved Notes"
-                results={exampleNotes}
+                title="Saved Notes"
+                query={query(
+                  collection(db, "notes"),
+                  where(
+                    "__name__",
+                    "in",
+                    userInfo.saved_notes?.length
+                      ? userInfo.saved_notes
+                      : ["not null"]
+                  )
+                )}
               />
             </TabsContent>
           </Tabs>

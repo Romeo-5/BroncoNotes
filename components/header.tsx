@@ -22,7 +22,7 @@ export function Header() {
   }, []);
 
   return (
-    <div className="sticky top-0 z-10 w-screen h-16 px-4 flex space-x-2 items-center">
+    <div className="sticky top-0 z-10 w-screen h-16 px-4 flex space-x-2 items-center bg-background">
       <Link href="/">
         <Button variant={"ghost"} size={"icon"}>
           <Image
@@ -42,9 +42,9 @@ export function Header() {
             Logout
           </Button>
           <Link href="/profile">
-            <Button size="icon">
+            <Button size="icon" className="rounded-full">
               <Image
-                className="size-10 rounded-lg"
+                className="size-10 rounded-full"
                 width={40}
                 height={40}
                 src={user.photoURL ?? "/public/BroncoNotes Logo.png"}

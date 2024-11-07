@@ -1,22 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NumberResults, SortBy } from "./result/options";
 import SearchResultCard from "./result/card";
 import SearchPagination from "./result/pagination";
-import { Note } from "@/lib/types";
+import { getDocs, Query, QueryDocumentSnapshot } from "firebase/firestore";
 
 export default function SearchResults({
-  resultsTitle,
-  results,
+  title,
+  query,
 }: {
-  resultsTitle: string;
-  results: Note[];
+  title: string;
+  query: Query;
 }) {
+  const [queryResults, setQueryResults] = useState<QueryDocumentSnapshot[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(3);
   const [sort, setSort] = useState("");
-  const totalResults = results.length;
+
+  useEffect(() => {
+    const getResults = async () => {
+      const querySnapshot = await getDocs(query);
+      if (querySnapshot.empty) {
+        setQueryResults([]);
+      } else {
+        console.dir(querySnapshot.docs.map((doc) => doc.data()));
+        setQueryResults(querySnapshot.docs);
+      }
+    };
+    getResults();
+  }, [query]);
+
+  const totalResults = queryResults.length;
   // Paginate the results
-  const paginatedNotes = results.slice(
+  const paginatedNotes = queryResults.slice(
     (currentPage - 1) * resultsPerPage,
     currentPage * resultsPerPage
   );
@@ -28,11 +43,11 @@ export default function SearchResults({
     <div className="container mx-auto flex flex-col justify-start items-center space-y-4">
       <div className="flex w-full justify-between">
         <div>
-          <div className="text-4xl font-semibold">{resultsTitle}</div>
+          <div className="text-4xl font-semibold">{title}</div>
           <div className="mt-1 text-xl">
             Showing {resultsPerPage * (currentPage - 1) + 1}-
-            {Math.min(results.length, resultsPerPage * currentPage)} of{" "}
-            {results.length} results
+            {Math.min(queryResults.length, resultsPerPage * currentPage)} of{" "}
+            {queryResults.length} results
           </div>
         </div>
         <div className="flex h-full space-x-4">
