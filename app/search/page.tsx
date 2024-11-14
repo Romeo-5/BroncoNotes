@@ -7,7 +7,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../firebaseConfig";
 import SearchResults from "@/components/search/result";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
+import { db } from "@/app/firebaseConfig";
 
 export default function SearchPage() {
   const searchParams = useSearchParams();

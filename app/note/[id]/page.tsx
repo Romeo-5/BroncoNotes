@@ -11,7 +11,7 @@ import ReportButton from "@/components/note/report-button";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth, db } from "@/firebaseConfig";
+import { auth, db } from "@/app/firebaseConfig";
 import {
   updateDoc,
   doc,

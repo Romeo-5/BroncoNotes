@@ -23,7 +23,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { db } from "@/firebaseConfig";
+import { db } from "@/app/firebaseConfig";
 
 export default function ProfilePage() {
   const searchParams = useSearchParams();

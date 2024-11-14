@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../firebaseConfig";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
 export default function HomePage() {

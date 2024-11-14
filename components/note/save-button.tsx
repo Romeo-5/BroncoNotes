@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Bookmark } from "lucide-react";
-import { db } from "@/firebaseConfig"; // Import Firestore configuration
+import { db } from "@/app/firebaseConfig"; // Import Firestore configuration
 import {
   doc,
   updateDoc,

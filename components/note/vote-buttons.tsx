@@ -10,7 +10,7 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { formatNumber } from "@/lib/utils";
-import { db } from "@/firebaseConfig"; // Import Firestore configuration
+import { db } from "@/app/firebaseConfig"; // Import Firestore configuration
 import {
   doc,
   updateDoc,

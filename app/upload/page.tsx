@@ -17,14 +17,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth, db, storage } from "@/firebaseConfig";
+import { auth, db, storage } from "@/app/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import Tesseract from "tesseract.js";
 import { OpenAI } from "openai";
 import { classCodes } from "@/lib/constants";
-
-const userId = "UID123";
 
 const SubmitNotes = () => {
   const [file, setFile] = useState<File | null>(null);

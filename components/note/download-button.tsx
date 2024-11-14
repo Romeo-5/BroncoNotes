@@ -2,7 +2,7 @@
 
 import { Button } from "../ui/button";
 import { Download } from "lucide-react";
-import { db } from "@/firebaseConfig"; // Adjust path as needed
+import { db } from "@/app/firebaseConfig"; // Adjust path as needed
 import { doc, updateDoc, increment } from "firebase/firestore";
 import Link from "next/link";
 
