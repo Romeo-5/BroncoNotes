@@ -38,7 +38,7 @@ export default function SearchPage() {
       );
       const courseSnapshot = await getDocs(courseQuery);
       if (courseSnapshot.empty) setCourseId("Course Not Found");
-      setCourseId(courseSnapshot.docs[0].id);
+      else setCourseId(courseSnapshot.docs[0].id);
     };
     getCourseIdFromName();
   }, [searchTerm]);
