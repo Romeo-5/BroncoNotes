@@ -55,11 +55,15 @@ export default function SearchResults({
           <SortBy state={[sort, setSort]} />
         </div>
       </div>
-      <div className="mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-        {paginatedNotes.map((note, index) => (
-          <SearchResultCard key={index} note={note} />
-        ))}
-      </div>
+      {paginatedNotes.length ? (
+        <div className="mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+          {paginatedNotes.map((note, index) => (
+            <SearchResultCard key={index} note={note} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-destructive text-2xl">No notes found.</div>
+      )}
       <SearchPagination
         currentPage={currentPage}
         totalResults={totalResults}
