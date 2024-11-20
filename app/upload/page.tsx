@@ -28,6 +28,7 @@ const SubmitNotes = () => {
   const [file, setFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Loading state for OCR
   const router = useRouter();
   const [user, setUser] = useState<User | string | null>(
     "I am not null, idiot >:("
@@ -108,13 +109,13 @@ const SubmitNotes = () => {
         Description: ${description}
         OCR Text: ${ocr}
 
-        Please generate a brief summary of the above content.
+        You are a teacher. Summarize the notes uploaded by a student and supplement it with any additional information about the notes.
       `;
 
       const response = await client.chat.completions.create({
         messages: [{ role: "user", content: prompt }],
         model: "gpt-4",
-        max_tokens: 150,
+        max_tokens: 500,
       });
 
       return response.choices[0]?.message?.content || "No summary available.";
@@ -131,6 +132,8 @@ const SubmitNotes = () => {
       setErrorMessage("Please fill all required fields and upload a file.");
       return;
     }
+
+    setIsLoading(true); // Set loading state
 
     try {
       // Step 1: Check if the course exists in Firestore
@@ -193,10 +196,13 @@ const SubmitNotes = () => {
 
       const docRef = await addDoc(collection(db, "notes"), noteData);
       console.log("Note uploaded with ID: ", docRef.id);
-      alert("File uploaded and summary generated successfully!");
+      alert("File uploaded and summary generated successfully!")
+      router.push("/home"); // Redirect after successful submission
     } catch (error) {
       console.error("Error uploading file or saving data:", error);
       setErrorMessage("Failed to upload and save data.");
+    } finally {
+      setIsLoading(false); // Reset loading state
     }
   };
 
@@ -256,7 +262,7 @@ const SubmitNotes = () => {
               </div>
             )}
           </div>
-
+  
           <div className="flex-1">
             <Label htmlFor="title" className="text-lg font-semibold">
               Title
@@ -268,7 +274,7 @@ const SubmitNotes = () => {
               placeholder="Enter note title"
               className="mb-2"
             />
-
+  
             <div className="text-lg font-semibold">Class Code</div>
             <div className="flex space-x-4 mb-2">
               <Select
@@ -288,7 +294,7 @@ const SubmitNotes = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
-
+  
               <Input
                 id="class-code-number"
                 type="number"
@@ -299,7 +305,7 @@ const SubmitNotes = () => {
                 className="w-1/2"
               />
             </div>
-
+  
             <div className="text-lg font-semibold">Quarter</div>
             <div className="flex space-x-4 mb-2">
               <Select onValueChange={setQuarter} defaultValue="Fall">
@@ -315,7 +321,7 @@ const SubmitNotes = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
-
+  
               <Select onValueChange={setYear} defaultValue="2024">
                 <SelectTrigger className="w-1/2">
                   <SelectValue />
@@ -331,7 +337,7 @@ const SubmitNotes = () => {
                 </SelectContent>
               </Select>
             </div>
-
+  
             <Label htmlFor="extra-info" className="text-lg font-semibold">
               Extra Information
             </Label>
@@ -341,18 +347,28 @@ const SubmitNotes = () => {
               onChange={(e) => setExtraInfo(e.target.value)}
               placeholder="Any extra information..."
             />
-
+  
             <div className="flex space-x-4 mt-4">
-              <Button onClick={handleSubmit}>Submit</Button>
+              <Button onClick={handleSubmit} disabled={isLoading}>
+                {isLoading ? "Uploading..." : "Submit"}
+              </Button>
               <Link href="/home">
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" disabled={isLoading}>
+                  Cancel
+                </Button>
               </Link>
             </div>
+  
+            {isLoading && (
+              <div className="mt-4 text-blue-500 text-center">
+                Processing your submission. Please wait...
+              </div>
+            )}
           </div>
         </div>
       </div>
     )
-  );
-};
+  );  
+}
 
 export default SubmitNotes;
